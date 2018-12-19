@@ -7,15 +7,16 @@ using namespace std;
 
 bool gameover = false;
 
-char resp[1024];
-char buffer[1024];
-
-
-void comunica(){
 
     WSADATA WSAData;
     SOCKET server;
     SOCKADDR_IN addr;
+
+
+
+void conecta(){
+
+
 
     WSAStartup(MAKEWORD(2,0), &WSAData);
     server = socket(AF_INET, SOCK_STREAM, 0);
@@ -28,53 +29,39 @@ void comunica(){
     printf("Connected to server!\n");
 
 
-    while (resp != "end" && !gameover){
-        send(server, buffer, sizeof(buffer), 0);
-        recv(server, resp , sizeof(resp), 0);
-    }
-
-    closesocket(server);
-    WSACleanup();
-    printf("Socket closed.");
-}
-
-
-
-DWORD WINAPI mythread( LPVOID lpParameter)
-{
-    cout<< "estou na thread" << endl;
-
-    while (!gameover){
-
-        cout << "o que você deseja fazer? " << endl;
-        scanf("%[^\n]s", buffer);
-        setbuf(stdin, NULL);
-        cout << "o server respondeu com  -->  " << resp << endl;
-    }
-
-	return 0;
-}
-
-
-void criaT1(){
-
-    HANDLE myhandle;
-	DWORD mythreadid;
-	myhandle = CreateThread(0, 0, mythread, 0, 0, &mythreadid);
-
-}
-
-void prog(){
-
-    cout<< "server disse que: " << resp << endl;
 
 }
 
 
 int main(){
 
-    criaT1();
-    comunica();
+    conecta();
+    char resp[1024];
+    char buffer[1024];
+
+    while(strcmp(buffer,"end")!=0){
+            cout << " o que vai fazer? " << endl;
+            scanf("%[^\n]", buffer);
+            setbuf(stdin, NULL);
+
+            send(server, buffer, sizeof(buffer), 0);
+            Sleep(3);
+            recv(server, resp, sizeof(resp), 0);
+
+            cout << "o server respondeu " << resp << endl;
+            if(strcmp(resp,"é quatro porra ") == 0){
+                cout<< "o server disse que é quatro " << endl;
+            }
+            else{
+                cout<< "o server nada disse " << endl;
+            }
+
+            strcpy(resp, "  ");
+    }
+
+    closesocket(server);
+    WSACleanup();
+    printf("Socket closed.");
 
 
     return 0;
