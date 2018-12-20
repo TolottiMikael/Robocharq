@@ -45,18 +45,10 @@ int main(){
             setbuf(stdin, NULL);
 
             send(server, buffer, sizeof(buffer), 0);
-            Sleep(3);
             recv(server, resp, sizeof(resp), 0);
 
             cout << "o server respondeu " << resp << endl;
-            if(strcmp(resp,"é quatro porra ") == 0){
-                cout<< "o server disse que é quatro " << endl;
-            }
-            else{
-                cout<< "o server nada disse " << endl;
-            }
 
-            strcpy(resp, "  ");
     }
 
     closesocket(server);
