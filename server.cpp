@@ -10,6 +10,25 @@ using namespace std;
     bool receivable2 = false;
     char aux[1024];
 
+    class Robo {
+
+public:
+    void vira(int i);
+    int getDir();
+    Robo(int a, int b);
+    int getX();
+    int getY();
+private:
+    void incDir(int i);
+    int dir = 1;
+    int x, y;
+
+
+};
+
+
+Robo *ply[2];
+
 
 
     WSADATA WSAData;
@@ -30,6 +49,7 @@ void criaServer(){
 }
 
 void leituraFre(int i){
+    int d;
     int otherP;
 
     if(i == 1 ){
@@ -39,23 +59,23 @@ void leituraFre(int i){
         otherP = 1;
     }
 
-     /*
+
     //aqui descobre a distância
     if(ply[i]->getY() == ply[otherP]->getY()){
         //estão na mesma linha
         if(ply[i]->getX() >= ply[otherP]->getX()){
-            return ply[i]->getX() - ply[otherP]->getX();
+           d = ply[i]->getX() - ply[otherP]->getX();
         }
         else {
-            return 0;
+           d = 0;
         }
     }
     else{
-        return 0;
+        d = 0;
     }
-    */
- //   int a = 100;
-    itoa(100, aux, 10);
+
+
+    sprintf( aux, "%d", d);
 }
 
 char leituraEsq(int i){
@@ -132,31 +152,14 @@ void criaT1(){
 
 }
 
-class Robo {
 
-public:
-    void vira(int i);
-    int getDir();
-    Robo(int a, int b);
-    int getX();
-    int getY();
-private:
-    void incDir(int i);
-    int dir = 1;
-    int x, y;
-
-
-};
-
-
-Robo *ply[2];
 
 
 int main()
 {
 
     ply[0] = new Robo(10 , 60);
-ply[1] = new Robo(132, 120);
+ply[1] = new Robo(5, 60);
     criaServer();
     Sleep(10);
     criaT1();
