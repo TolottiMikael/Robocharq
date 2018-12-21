@@ -31,10 +31,14 @@ void conecta(){
 
 
 }
-
+void compila(){
+    system("g++ teste.cpp -o teste");
+    Sleep(1000);
+    system("teste");
+}
 
 int main(){
-
+    compila();
     conecta();
     char resp[1024];
     char buffer[1024];

@@ -79,11 +79,63 @@ void leituraFre(int i){
 }
 
 char leituraEsq(int i){
-    return '0';
+    int d;
+    int otherP;
+
+    if(i == 1 ){
+        otherP = 0;
+    }
+    else if( i == 0 ){
+        otherP = 1;
+    }
+
+
+    //aqui descobre a distância
+    if(ply[i]->getX() == ply[otherP]->getX()){
+        //estão na mesma linha
+        if(ply[i]->getY() >= ply[otherP]->getY()){
+           d = ply[i]->getY() - ply[otherP]->getY();
+        }
+        else {
+           d = 0;
+        }
+    }
+    else{
+        d = 0;
+    }
+
+
+    sprintf( aux, "%d", d);
 }
 
 char leituraDir(int i){
-    return '0';
+    int d;
+    int otherP;
+
+    if(i == 1 ){
+        otherP = 0;
+    }
+    else if( i == 0 ){
+        otherP = 1;
+    }
+
+
+    //aqui descobre a distância
+    if(ply[i]->getX() == ply[otherP]->getX()){
+        //estão na mesma linha
+        if(ply[i]->getY() <= ply[otherP]->getY()){
+           d = ply[i]->getY() - ply[otherP]->getY();
+        }
+        else {
+           d = 0;
+        }
+    }
+    else{
+        d = 0;
+    }
+
+
+    sprintf( aux, "%d", d);
 }
 
 
@@ -115,10 +167,12 @@ void comunica(int i){
                strcpy(resp, aux);
             }
             else if(strcmp(buffer,"leituraEsq") == 0){
-                strcpy(resp, "100");
+                leituraEsq(robot);
+               strcpy(resp, aux);
             }
             else if(strcmp(buffer,"leituraDir") == 0){
-                strcpy(resp, "100");
+                leituraDir(robot);
+               strcpy(resp, aux);
             }
             else{
                 strcpy(resp,"não entendi!");
@@ -159,7 +213,7 @@ int main()
 {
 
     ply[0] = new Robo(10 , 60);
-ply[1] = new Robo(5, 60);
+    ply[1] = new Robo(5, 60);
     criaServer();
     Sleep(10);
     criaT1();
