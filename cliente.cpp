@@ -1,18 +1,63 @@
+#ifndef USUARIO
+#define USUARIO
+
+
+#include "user.cpp"
+
 #include <iostream>
 #include <Windows.h>
 #include <stdio.h>
 #include <winsock2.h>
 
+
+
 using namespace std;
 
 bool gameover = false;
+
+void setup();
+void loop();
 
 
     WSADATA WSAData;
     SOCKET server;
     SOCKADDR_IN addr;
 
+float leituraFre(){
+    char env[1024];
+    float dist;
+    strcpy(env, "leituraFre");
+    send(server, env, sizeof(env), 0);
+    recv(server, env, sizeof(env), 0);
 
+    dist = atof(env);
+
+    return dist;
+}
+
+float leituraEsq(){
+    char env[1024];
+    float dist;
+    strcpy(env, "leituraEsq");
+    send(server, env, sizeof(env), 0);
+    recv(server, env, sizeof(env), 0);
+
+    dist = atof(env);
+
+    return dist;
+}
+
+float leituraDir(){
+    char env[1024];
+    float dist;
+    strcpy(env, "leituraDir");
+    send(server, env, sizeof(env), 0);
+    recv(server, env, sizeof(env), 0);
+
+    dist = atof(env);
+
+    return dist;
+}
 
 void conecta(){
 
@@ -31,35 +76,28 @@ void conecta(){
 
 
 }
-void compila(){
-    system("g++ teste.cpp -o teste");
-    Sleep(1000);
-    system("teste");
-}
 
 int main(){
-    compila();
+
+
     conecta();
     char resp[1024];
     char buffer[1024];
 
-    while(strcmp(buffer,"end")!=0){
-            cout << " o que vai fazer? " << endl;
-            scanf("%[^\n]", buffer);
-            setbuf(stdin, NULL);
 
-            send(server, buffer, sizeof(buffer), 0);
-            recv(server, resp, sizeof(resp), 0);
 
-            cout << "o server respondeu " << resp << endl;
-
+    while(!gameover){
+        loop();
     }
 
     closesocket(server);
     WSACleanup();
     printf("Socket closed.");
 
-
     return 0;
 
 }
+
+
+
+#endif //USUARIO

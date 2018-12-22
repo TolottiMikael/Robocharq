@@ -124,7 +124,7 @@ char leituraDir(int i){
     if(ply[i]->getX() == ply[otherP]->getX()){
         //estão na mesma linha
         if(ply[i]->getY() <= ply[otherP]->getY()){
-           d = ply[i]->getY() - ply[otherP]->getY();
+           d = ply[otherP]->getY() - ply[i]->getY();
         }
         else {
            d = 0;
@@ -134,14 +134,12 @@ char leituraDir(int i){
         d = 0;
     }
 
-
     sprintf( aux, "%d", d);
 }
 
 
 
 void comunica(int i){
-
 
     int robot = i;
     char buffer[1024];
@@ -190,7 +188,6 @@ void comunica(int i){
 
 DWORD WINAPI mythread( LPVOID lpParameter)
 {
-    cout<< "estou na thread 2" << endl;
 
     comunica(0);
 
@@ -206,14 +203,25 @@ void criaT1(){
 
 }
 
+void iniciaUsers(){
+    system("g++ usuario.cpp -o user1");
+    Sleep(1000);
+    system("user1");
+
+    system("g++ usuario2.cpp -o user2");
+    Sleep(1000);
+    system("user2");
+}
 
 
 
 int main()
 {
+    iniciaUsers();
 
-    ply[0] = new Robo(10 , 60);
-    ply[1] = new Robo(5, 60);
+    ply[0] = new Robo(15 , 60);
+    ply[1] = new Robo(10, 60);
+
     criaServer();
     Sleep(10);
     criaT1();
