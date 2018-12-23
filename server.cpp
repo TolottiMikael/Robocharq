@@ -47,9 +47,7 @@ void criaServer(){
     serverAddr.sin_port = htons(5555);
 
 }
-
-void leituraFre(int i){
-    int d;
+int calc(int i){
     int otherP;
 
     if(i == 1 ){
@@ -60,19 +58,12 @@ void leituraFre(int i){
     }
 
 
-    //aqui descobre a distância
-    if(ply[i]->getY() == ply[otherP]->getY()){
-        //estão na mesma linha
-        if(ply[i]->getX() >= ply[otherP]->getX()){
-           d = ply[i]->getX() - ply[otherP]->getX();
-        }
-        else {
-           d = 0;
-        }
-    }
-    else{
-        d = 0;
-    }
+}
+
+void leituraFre(int i){
+    int d;
+//aqui descobre a distância
+    d = calc(i, ply[i]->getDir());
 
 
     sprintf( aux, "%d", d);
@@ -80,29 +71,8 @@ void leituraFre(int i){
 
 char leituraEsq(int i){
     int d;
-    int otherP;
-
-    if(i == 1 ){
-        otherP = 0;
-    }
-    else if( i == 0 ){
-        otherP = 1;
-    }
-
-
     //aqui descobre a distância
-    if(ply[i]->getX() == ply[otherP]->getX()){
-        //estão na mesma linha
-        if(ply[i]->getY() >= ply[otherP]->getY()){
-           d = ply[i]->getY() - ply[otherP]->getY();
-        }
-        else {
-           d = 0;
-        }
-    }
-    else{
-        d = 0;
-    }
+    d = calc(i, ply[i]->getDir() - 90);
 
 
     sprintf( aux, "%d", d);
@@ -110,29 +80,9 @@ char leituraEsq(int i){
 
 char leituraDir(int i){
     int d;
-    int otherP;
-
-    if(i == 1 ){
-        otherP = 0;
-    }
-    else if( i == 0 ){
-        otherP = 1;
-    }
-
 
     //aqui descobre a distância
-    if(ply[i]->getX() == ply[otherP]->getX()){
-        //estão na mesma linha
-        if(ply[i]->getY() <= ply[otherP]->getY()){
-           d = ply[otherP]->getY() - ply[i]->getY();
-        }
-        else {
-           d = 0;
-        }
-    }
-    else{
-        d = 0;
-    }
+    d = calc(i, ply[i]->getDir() + 90);
 
     sprintf( aux, "%d", d);
 }
@@ -172,6 +122,13 @@ void comunica(int i){
                 leituraDir(robot);
                strcpy(resp, aux);
             }
+            else if(strcmp(buffer,"vira") == 0){
+                recv(client, buffer, sizeof(buffer), 0);
+                int dist;
+                dist = atoi(buffer);
+                ply[i]->vira(dist);
+                cout<< "girou em : " << dist <<endl;
+            }
             else{
                 strcpy(resp,"não entendi!");
             }
@@ -204,6 +161,8 @@ void criaT1(){
 }
 
 void iniciaUsers(){
+	system("SET path=%path%;MinGW64\bin");
+	
     system("g++ usuario.cpp -o user1");
     Sleep(1000);
     system("user1");
@@ -239,17 +198,10 @@ void Robo::vira(int i){
 void Robo::incDir(int i){
     this->dir += i;
 
-    while(this->dir > 4 || this->dir < 1) {
-        if (this->dir > 4){
-            this->dir -= 4;
-        }
-        else {
-            this-> dir += 4;
-        }
-
+    if(this->dir>= 360){
+        this->dir -= 360;
     }
-
-}
+    }
 
 int Robo::getDir(){
     return this->dir;

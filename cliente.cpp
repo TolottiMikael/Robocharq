@@ -59,6 +59,23 @@ float leituraDir(){
     return dist;
 }
 
+void gira(int g){
+    char env[1024];
+    strcpy(env, "vira");
+    send(server, env, sizeof(env), 0);
+    sprintf( env, "%d", g);
+    send(server, env, sizeof(env), 0);
+}
+
+void anda(){
+    char env[1024];
+    strcpy(env, "anda");
+    send(server, env, sizeof(env), 0);
+}
+
+
+
+
 void conecta(){
 
 
@@ -83,7 +100,6 @@ int main(){
     conecta();
     char resp[1024];
     char buffer[1024];
-
 
 
     while(!gameover){
