@@ -220,7 +220,10 @@ void comunica(int i){
             }
 
             send(client, resp, sizeof(resp), 0);
+            Sleep(100);
         }
+        strcpy(resp,"gameover");
+        send(client, resp, sizeof(resp), 0);
         closesocket(client);
         printf("Client disconnected.");
     }
@@ -269,9 +272,9 @@ void iniciaUsers(){
     system("g++ user2.cpp -o user2");
     Sleep(1000);
 */
-    system("user");
+    system("start user");
     cout<< "iniciando o segundo ! "<< endl;
-    system("user2");
+    system("start user2");
     cout<< "terminei" << endl;
 
     }
@@ -310,7 +313,8 @@ int main()
     criaT1();
     Sleep(100);
     criaT2();
-    iniciaUsers();
+    Sleep(1000);
+    //iniciaUsers();
     system("cls");
     start = true;
     while(!gameover){
@@ -325,7 +329,7 @@ int main()
         else if(checkP1(1)){
             gameover = true;
         }
-        Sleep(1000);
+        Sleep(100);
         system("cls");
     }
     if(checkP1(0)){
@@ -374,6 +378,13 @@ Robo::Robo(float a, float b){
 
 void Robo::anda(){
 
-    this->x = sin(this->getDir()) * 1;
-    this->y = cos(this->getDir()) * 1;
+    float X, Y;
+    X = this->x;
+    Y = this->y;
+
+    X = sin(X* 3.14159265 /180);
+    Y = sin(Y* 3.14159265 /180);
+
+    this->x = X * 1;
+    this->y = Y * 1;
 }

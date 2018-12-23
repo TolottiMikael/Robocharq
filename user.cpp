@@ -14,12 +14,11 @@ void setup(){
 }
 
 void loop(){
-    if(leituraFre() == 0){
+    while(leituraFre() == 0){
         vira(15);
     }
-    else {
-        anda();
-    }
+    anda();
+
 }
 
 

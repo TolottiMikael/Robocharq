@@ -15,7 +15,7 @@
 using namespace std;
 
 bool gameover = false;
-
+char env[1024];
 void setup();
 void loop();
 
@@ -25,7 +25,6 @@ void loop();
     SOCKADDR_IN addr;
 
 float leituraFre(){
-    char env[1024];
     float dist;
     strcpy(env, "leituraFre");
     send(server, env, sizeof(env), 0);
@@ -36,7 +35,7 @@ float leituraFre(){
 }
 
 float leituraEsq(){
-    char env[1024];
+
     float dist;
     strcpy(env, "leituraEsq");
     send(server, env, sizeof(env), 0);
@@ -48,7 +47,6 @@ float leituraEsq(){
 }
 
 float leituraDir(){
-    char env[1024];
     float dist;
     strcpy(env, "leituraDir");
     send(server, env, sizeof(env), 0);
@@ -60,7 +58,6 @@ float leituraDir(){
 }
 
 void vira(int g){
-    char env[1024];
     strcpy(env, "vira");
     send(server, env, sizeof(env), 0);
     sprintf( env, "%d", g);
@@ -68,7 +65,6 @@ void vira(int g){
 }
 
 void anda(){
-    char env[1024];
     strcpy(env, "anda");
     send(server, env, sizeof(env), 0);
 }
@@ -101,9 +97,13 @@ int main(){
     char resp[1024];
     char buffer[1024];
 
-
+    strcpy(env, "llobby");
     while(!gameover){
         loop();
+        if(strcmp(env,"gameover") == 0){
+            gameover = true;
+        }
+        Sleep(100);
     }
 
     closesocket(server);
