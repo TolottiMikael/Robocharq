@@ -3,11 +3,11 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace std;
 
     bool gameover = false;
-    bool receivable2 = false;
     char aux[1024];
 
     class Robo {
@@ -15,13 +15,14 @@ using namespace std;
 public:
     void vira(int i);
     int getDir();
-    Robo(int a, int b);
-    int getX();
-    int getY();
+    Robo(float a, float b);
+    float getX();
+    float getY();
+    void anda();
 private:
     void incDir(int i);
-    int dir = 1;
-    int x, y;
+    int dir = 270;
+    float x, y;
 
 
 };
@@ -47,44 +48,126 @@ void criaServer(){
     serverAddr.sin_port = htons(5555);
 
 }
-int calc(int i){
-    int otherP;
-
-    if(i == 1 ){
-        otherP = 0;
-    }
-    else if( i == 0 ){
-        otherP = 1;
-    }
 
 
+float calc(int i, float a){
+
+float t;
+float ang;
+float catX, catY;
+float X[2], Y[2];
+
+int otherP = 1;
+
+if(i == 1){
+    otherP = 0;
+}
+
+catX = 0;
+catY = 0;
+
+X[0] = ply[i]->getX();
+Y[0] = ply[i]->getY();
+
+X[1] = ply[otherP]->getX();
+Y[1] = ply[otherP]->getY();
+
+catX = X[0] - X[1];
+catY = Y[0] - Y[1];
+
+
+ t = sqrt( pow( catX ,  2)  +  pow( catY  ,  2) );
+
+	if(Y[0] == Y[1] ){
+		if( X[0] > X[1] ){
+			ang = 270;
+			t = X[0] - X[1];
+		}
+		else if(X[0] < X[1]){
+			ang = 90;
+			t = X[1] - X[0];
+		}
+	}
+	else if(X[0] == X[1] ){
+		if( Y[0] < Y[1] ){
+			ang = 0;
+		}
+		else if(Y[0] > Y[1]){
+			ang = 180;
+		}
+	}
+	else{
+		//sin(A) = X/T
+		ang = asin( (catX / t) );
+
+
+	ang = (ang * 180) / 3.14;
+	if(ang < 0){
+		ang = ang * -1;
+	}
+
+
+	if(catX < 0  && catY < 0){
+		ang = 180 + ang;
+	}
+	else if  (catX > 0  && catY < 0){
+		ang = 180 - ang;
+	}
+
+	else if  (catX > 0  && catY > 0){
+		ang = 180 + ang;
+	}
+
+	else if  (catX < 0  && catY > 0){
+		ang = 180 - ang;
+	}
+	}
+
+
+
+	do{
+	if(a >= 360){
+		a-= 360;
+	}
+	else if(a < 0){
+		a+= 360;
+	}
+	}while (a > 360  || a < 0);
+
+
+	if (a > ( ang - 12 ) && a < ( ang + 12 )) {
+		return t;
+	}
+
+	else {
+		return 0;
+	}
 }
 
 void leituraFre(int i){
-    int d;
+    float d;
 //aqui descobre a distância
     d = calc(i, ply[i]->getDir());
-
-
-    sprintf( aux, "%d", d);
+    cout<< "distancia de : " << d << endl;
+    sprintf( aux, "%f", d);
 }
 
 char leituraEsq(int i){
-    int d;
+    float d;
     //aqui descobre a distância
     d = calc(i, ply[i]->getDir() - 90);
 
 
-    sprintf( aux, "%d", d);
+    sprintf( aux, "%f", d);
 }
 
 char leituraDir(int i){
-    int d;
+    float d;
 
     //aqui descobre a distância
     d = calc(i, ply[i]->getDir() + 90);
 
-    sprintf( aux, "%d", d);
+    sprintf( aux, "%f", d);
 }
 
 
@@ -112,7 +195,7 @@ void comunica(int i){
 
             if(strcmp(buffer,"leituraFre") == 0){
                 leituraFre(robot);
-               strcpy(resp, aux);
+                strcpy(resp, aux);
             }
             else if(strcmp(buffer,"leituraEsq") == 0){
                 leituraEsq(robot);
@@ -127,12 +210,13 @@ void comunica(int i){
                 int dist;
                 dist = atoi(buffer);
                 ply[i]->vira(dist);
-                cout<< "girou em : " << dist <<endl;
+            }
+            else if(strcmp(buffer,"anda") == 0){
+                ply[i]->anda();
             }
             else{
                 strcpy(resp,"não entendi!");
             }
-            cout<< "respondi com "<< resp << endl;
 
             send(client, resp, sizeof(resp), 0);
         }
@@ -162,7 +246,7 @@ void criaT1(){
 
 void iniciaUsers(){
 	system("SET path=%path%;MinGW64\bin");
-	
+
     system("g++ usuario.cpp -o user1");
     Sleep(1000);
     system("user1");
@@ -176,18 +260,16 @@ void iniciaUsers(){
 
 int main()
 {
-    iniciaUsers();
+    //iniciaUsers();
 
-    ply[0] = new Robo(15 , 60);
-    ply[1] = new Robo(10, 60);
+    ply[0] = new Robo(15 , 30);
+    ply[1] = new Robo(10, 30);
 
     criaServer();
     Sleep(10);
     criaT1();
     Sleep(100);
     comunica(1);
-
-
 
 }
 
@@ -198,24 +280,37 @@ void Robo::vira(int i){
 void Robo::incDir(int i){
     this->dir += i;
 
-    if(this->dir>= 360){
-        this->dir -= 360;
-    }
+    do{
+	if(this->dir >= 360){
+		this->dir-= 360;
+	}
+	else if(this->dir < 0){
+		this->dir+= 360;
+	}
+	}while (this->dir > 360  || this->dir < 0);
+
     }
 
 int Robo::getDir(){
     return this->dir;
 }
 
-int Robo::getX(){
+float Robo::getX(){
     return this->x;
 }
 
-int Robo::getY(){
+float Robo::getY(){
     return this->y;
 }
 
-Robo::Robo(int a, int b){
+Robo::Robo(float a, float b){
     this->x = a;
     this->y = b;
+}
+
+void Robo::anda(){
+
+    this->x = sin(this->getDir()) * 1;
+    this->y = cos(this->getDir()) * 1;
+    cout << "new position : x -> " << this->x << " Y -> " << this->y << endl;
 }

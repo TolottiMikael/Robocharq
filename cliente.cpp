@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <winsock2.h>
+#include <cstdlib>
 
 
 
@@ -31,7 +32,6 @@ float leituraFre(){
     recv(server, env, sizeof(env), 0);
 
     dist = atof(env);
-
     return dist;
 }
 
@@ -59,7 +59,7 @@ float leituraDir(){
     return dist;
 }
 
-void gira(int g){
+void vira(int g){
     char env[1024];
     strcpy(env, "vira");
     send(server, env, sizeof(env), 0);

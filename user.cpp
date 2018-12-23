@@ -14,7 +14,10 @@ void setup(){
 }
 
 void loop(){
+    anda();
     Sleep(1000);
+    vira(56);
+
 }
 
 
