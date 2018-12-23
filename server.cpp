@@ -8,6 +8,7 @@
 using namespace std;
 
     bool gameover = false;
+    bool start = false;
     char aux[1024];
 
     class Robo {
@@ -148,7 +149,6 @@ void leituraFre(int i){
     float d;
 //aqui descobre a distância
     d = calc(i, ply[i]->getDir());
-    cout<< "distancia de : " << d << endl;
     sprintf( aux, "%f", d);
 }
 
@@ -181,18 +181,19 @@ void comunica(int i){
 
     bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
     listen(server, 0);
+    while(!start){
+        Sleep(1);
+    }
 
-    printf("Listening for incoming connections...\n");
+    printf("lobby \n");
     int clientAddrSize = sizeof(clientAddr);
     if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
     {
 
         printf("Client  connected!\n");
 
-        while (strcmp(buffer,"end")!=0){
-
+        while (!gameover){
             recv(client, buffer, sizeof(buffer), 0);
-
             if(strcmp(buffer,"leituraFre") == 0){
                 leituraFre(robot);
                 strcpy(resp, aux);
@@ -244,32 +245,95 @@ void criaT1(){
 
 }
 
+DWORD WINAPI player2( LPVOID lpParameter)
+{
+
+    comunica(1);
+
+	return 0;
+}
+
+void criaT2(){
+
+    HANDLE myhandle;
+	DWORD mythreadid;
+	myhandle = CreateThread(0, 0, player2, 0, 0, &mythreadid);
+
+}
+
 void iniciaUsers(){
 	system("SET path=%path%;MinGW64\bin");
-
-    system("g++ usuario.cpp -o user1");
+    /*
+    system("g++ user.cpp -o user1");
     Sleep(1000);
-    system("user1");
-
-    system("g++ usuario2.cpp -o user2");
+    system("g++ user2.cpp -o user2");
     Sleep(1000);
+*/
+    system("user");
+    cout<< "iniciando o segundo ! "<< endl;
     system("user2");
+    cout<< "terminei" << endl;
+
+    }
+
+bool checkP1(int i){
+    if (ply[i]->getX() < (-15) || ply[i]->getX() > 15){
+        return true;
+    }
+    else if(ply[i]->getY() < (-15) || ply[i]->getY() > 15){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void printGame(){
+
+cout<< "Player 1 x \t y \t dir" << " || Player 2 x \t y \t dir" << endl;
+        cout<< " \t "<< ply[0]->getX() << " \t " << ply[0]->getY() << " \t " << ply[0]->getDir()
+        << " ||\t " << ply[1]->getX() << " \t " << ply[1]->getY() << " \t " << ply[1]->getDir() << endl;
+
 }
 
 
 
 int main()
 {
-    //iniciaUsers();
 
-    ply[0] = new Robo(15 , 30);
-    ply[1] = new Robo(10, 30);
+
+    ply[0] = new Robo(5 , 10);
+    ply[1] = new Robo(10, 5);
 
     criaServer();
     Sleep(10);
     criaT1();
     Sleep(100);
-    comunica(1);
+    criaT2();
+    iniciaUsers();
+    system("cls");
+    start = true;
+    while(!gameover){
+
+        printGame();
+
+
+
+        if(checkP1(0)){
+            gameover = true;
+        }
+        else if(checkP1(1)){
+            gameover = true;
+        }
+        Sleep(1000);
+        system("cls");
+    }
+    if(checkP1(0)){
+        cout << "player 2 venceu" << endl;
+    }
+    else {
+        cout << "player 1 venceu" << endl;
+    }
 
 }
 
@@ -312,5 +376,4 @@ void Robo::anda(){
 
     this->x = sin(this->getDir()) * 1;
     this->y = cos(this->getDir()) * 1;
-    cout << "new position : x -> " << this->x << " Y -> " << this->y << endl;
 }

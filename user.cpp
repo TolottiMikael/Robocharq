@@ -14,10 +14,12 @@ void setup(){
 }
 
 void loop(){
-    anda();
-    Sleep(1000);
-    vira(56);
-
+    if(leituraFre() == 0){
+        vira(15);
+    }
+    else {
+        anda();
+    }
 }
 
 
