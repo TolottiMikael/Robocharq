@@ -16,6 +16,7 @@ using namespace std;
 
 bool gameover = false;
 char env[1024];
+char response[1024];
 void setup();
 void loop();
 
@@ -28,9 +29,9 @@ float leituraFre(){
     float dist;
     strcpy(env, "leituraFre");
     send(server, env, sizeof(env), 0);
-    recv(server, env, sizeof(env), 0);
+    recv(server, response, sizeof(response), 0);
 
-    dist = atof(env);
+    dist = atof(response);
     return dist;
 }
 
@@ -39,9 +40,9 @@ float leituraEsq(){
     float dist;
     strcpy(env, "leituraEsq");
     send(server, env, sizeof(env), 0);
-    recv(server, env, sizeof(env), 0);
+    recv(server, response, sizeof(response), 0);
 
-    dist = atof(env);
+    dist = atof(response);
 
     return dist;
 }
@@ -50,9 +51,9 @@ float leituraDir(){
     float dist;
     strcpy(env, "leituraDir");
     send(server, env, sizeof(env), 0);
-    recv(server, env, sizeof(env), 0);
+    recv(server, response, sizeof(response), 0);
 
-    dist = atof(env);
+    dist = atof(response);
 
     return dist;
 }
@@ -90,6 +91,20 @@ void conecta(){
 
 }
 
+bool checkGame(){
+    strcpy(env, "endGame");
+    send(server, env, sizeof(env), 0);
+    recv(server, response, sizeof(response), 0);
+
+    if(strcmp(response,"yes") == 0){
+
+        return true;
+    }
+    else {
+         return false;
+    }
+}
+
 int main(){
 
 
@@ -100,10 +115,11 @@ int main(){
     strcpy(env, "llobby");
     while(!gameover){
         loop();
-        if(strcmp(env,"gameover") == 0){
+        if(checkGame){
             gameover = true;
         }
-        Sleep(100);
+
+        system("cls");
     }
 
     closesocket(server);

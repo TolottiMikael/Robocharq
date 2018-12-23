@@ -19,7 +19,9 @@ public:
     Robo(float a, float b);
     float getX();
     float getY();
-    void anda();
+    void andaX(float X);
+    void andaY(float Y);
+
 private:
     void incDir(int i);
     int dir = 270;
@@ -170,7 +172,37 @@ char leituraDir(int i){
     sprintf( aux, "%f", d);
 }
 
+void anda(int i){
+    int otherP = 1;
 
+    if(i == 1){
+    otherP = 0;
+    }
+
+    float X, Y;
+    X = ply[i]->getDir();
+    Y = ply[i]->getDir();
+
+    X = sin(X* 3.14159265 /180);
+    Y = cos(Y* 3.14159265 /180);
+
+    if((ply[i]->getX() + X) == ply[otherP]->getX() && (ply[i]->getY() + Y) == ply[otherP]->getY()){
+        if(ply[i]->getDir() == (ply[otherP]->getDir() + 180)){
+            cout<< "estão travados" << endl;
+        }
+        else {
+            ply[i]->andaX(X);
+            ply[i]->andaX(Y);
+
+            ply[otherP]->andaX(-X);
+            ply[otherP]->andaY(-Y);
+        }
+    }
+    else {
+    ply[i]->andaX(X);
+    ply[i]->andaX(Y);
+}
+}
 
 void comunica(int i){
 
@@ -213,17 +245,21 @@ void comunica(int i){
                 ply[i]->vira(dist);
             }
             else if(strcmp(buffer,"anda") == 0){
-                ply[i]->anda();
+                anda(robot);
             }
             else{
-                strcpy(resp,"não entendi!");
+                strcpy(resp,"noo");
             }
 
             send(client, resp, sizeof(resp), 0);
-            Sleep(100);
         }
-        strcpy(resp,"gameover");
+
+        while(strcmp(buffer,"endGame") == 0){
+            recv(client, buffer, sizeof(buffer), 0);
+        }
+        strcpy(resp, "yes");
         send(client, resp, sizeof(resp), 0);
+
         closesocket(client);
         printf("Client disconnected.");
     }
@@ -274,7 +310,7 @@ void iniciaUsers(){
 */
     system("start user");
     cout<< "iniciando o segundo ! "<< endl;
-    system("start user2");
+    system("start user");
     cout<< "terminei" << endl;
 
     }
@@ -314,7 +350,7 @@ int main()
     Sleep(100);
     criaT2();
     Sleep(1000);
-    //iniciaUsers();
+    iniciaUsers();
     system("cls");
     start = true;
     while(!gameover){
@@ -338,6 +374,8 @@ int main()
     else {
         cout << "player 1 venceu" << endl;
     }
+
+    Sleep(1000);
 
 }
 
@@ -376,15 +414,10 @@ Robo::Robo(float a, float b){
     this->y = b;
 }
 
-void Robo::anda(){
+void Robo::andaX(float X){
+    this->x += X;
+}
 
-    float X, Y;
-    X = this->x;
-    Y = this->y;
-
-    X = sin(X* 3.14159265 /180);
-    Y = sin(Y* 3.14159265 /180);
-
-    this->x = X * 1;
-    this->y = Y * 1;
+void Robo::andaY(float Y){
+    this->y += Y;
 }

@@ -15,8 +15,10 @@ void setup(){
 
 void loop(){
     while(leituraFre() == 0){
-        vira(15);
+        vira(1);
+        cout << "viraaa" << endl;
     }
+    cout << " anda !!!" << endl;
     anda();
 
 }
