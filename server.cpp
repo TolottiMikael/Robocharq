@@ -41,7 +41,6 @@ Robo *ply[2];
 
     SOCKADDR_IN serverAddr,clientAddr, clientAddr2;
 
-
 void criaServer(){
     WSAStartup(MAKEWORD(2,0), &WSAData);
     server = socket(AF_INET, SOCK_STREAM, 0);
@@ -301,13 +300,12 @@ void criaT2(){
 }
 
 void iniciaUsers(){
-	system("SET path=%path%;MinGW64\bin");
-    /*
-    system("g++ user.cpp -o user1");
+
+    system("MinGW64\bin\g++.exe user.cpp -o user1 -lws_32s");
     Sleep(1000);
-    system("g++ user2.cpp -o user2");
+    system("g++ user.cpp -o user2 -lws_32s");
     Sleep(1000);
-*/
+
     system("start user");
     cout<< "iniciando o segundo ! "<< endl;
     system("start user");
@@ -339,7 +337,6 @@ cout<< "Player 1 x \t y \t dir" << " || Player 2 x \t y \t dir" << endl;
 
 int main()
 {
-
 
     ply[0] = new Robo(5 , 10);
     ply[1] = new Robo(10, 5);
@@ -376,7 +373,7 @@ int main()
     }
 
     Sleep(1000);
-
+    return 0;
 }
 
 void Robo::vira(int i){
