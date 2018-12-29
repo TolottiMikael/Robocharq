@@ -10,6 +10,9 @@ using namespace std;
     bool gameover = false;
     bool start = false;
     char aux[1024];
+    int roboX[2][1024];
+    int roboY[2][1024];
+    int turno = 0;
 
     class Robo {
 
@@ -251,6 +254,9 @@ void comunica(int i){
             }
 
             send(client, resp, sizeof(resp), 0);
+            roboX[robot][turno] = ply[i]->getX();
+            roboY[robot][turno] = ply[i]->getY();
+            turno++;
         }
 
         while(strcmp(buffer,"endGame") == 0){
@@ -308,7 +314,7 @@ void iniciaUsers(){
 
     system("start user");
     cout<< "iniciando o segundo ! "<< endl;
-    system("start user");
+   // system("start user");
     cout<< "terminei" << endl;
 
     }
@@ -372,6 +378,11 @@ int main()
         cout << "player 1 venceu" << endl;
     }
 
+    int i;
+    for(i =0; i <= turno; i++){
+        cout<< "robo 1X" << roboX[0][i] << "\t robo 1 Y" << roboY[0][i] << endl;
+        cout<< "robo 2X" << roboX[1][i] << "\t robo 2 Y" << roboY[1][i] << endl;
+    }
     Sleep(1000);
     return 0;
 }
