@@ -188,6 +188,6 @@ int main(void){
     al_destroy_timer(timer);
     al_destroy_display(janela);
     al_destroy_event_queue(fila_eventos);
-
+    std::cout<< "oiii"<< std::endl;
     return 0;
 }
