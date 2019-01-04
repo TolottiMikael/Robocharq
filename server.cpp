@@ -30,8 +30,8 @@ using namespace std;
     bool gameover = false;
     bool start = false;
     char aux[1024];
-    float roboX[2][1024];
-    float roboY[2][1024];
+    float roboX[2][10000];
+    float roboY[2][10000];
     int turno = 0;
     bool sTurno = false;
 
@@ -336,7 +336,7 @@ void criaT2(){
 
 void iniciaUsers(){
 
-    system("MinGW64\bin\g++.exe user.cpp -o user1 -lws_32s");
+    system("MinGW64\bin\g++ user.cpp -o user1 -lws_32s");
     Sleep(1000);
     system("g++ user.cpp -o user2 -lws_32s");
     Sleep(1000);
@@ -549,9 +549,8 @@ int main()
     criaServer();
     Sleep(10);
     criaT1();
-    Sleep(100);
     criaT2();
-    Sleep(1000);
+    Sleep(10);
     iniciaUsers();
     system("cls");
     start = true;
@@ -580,8 +579,9 @@ int main()
 
     int i;
     for(i =0; i <= turno; i++){
-        cout<< "robo 1X" << roboX[0][i] << "\t robo 1 Y" << roboY[0][i] << endl;
-        cout<< "robo 2X" << roboX[1][i] << "\t robo 2 Y" << roboY[1][i] << endl;
+
+        cout<< "robo 1 X" << roboX[0][i] << "\t robo 1 Y" << roboY[0][i] << endl;
+        cout<< "robo 2 X" << roboX[1][i] << "\t robo 2 Y" << roboY[1][i] << "\t for nro:" << i << endl;
     }
     Sleep(1000);
 
