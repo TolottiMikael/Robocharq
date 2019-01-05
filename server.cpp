@@ -1,21 +1,19 @@
 #include <iostream>
 #include <stdio.h>
 #include <winsock2.h>
-#include <windows.h>
 #include <stdlib.h>
 #include <math.h>
+#include <windows.h>
 
+#define ALLEGRO 1
 
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_native_dialog.h>
-#include <allegro5/allegro_image.h>
+    #include <allegro5/allegro.h>
+    #include <allegro5/allegro_native_dialog.h>
+    #include <allegro5/allegro_image.h>
 
-
-
-#define FPS 60.0
-#define LARGURA_TELA 640
-#define ALTURA_TELA 480
-
+    #define LARGURA_TELA 640
+    #define ALTURA_TELA 480
+	int  FPS = 60.0;
     ALLEGRO_DISPLAY *janela = NULL;
     ALLEGRO_EVENT_QUEUE *fila_eventos = NULL;
     ALLEGRO_TIMER *timer = NULL;
@@ -24,6 +22,14 @@
     ALLEGRO_BITMAP *seta1 = NULL;
     ALLEGRO_BITMAP *seta2 = NULL;
 
+
+#if ALLEGRO
+    #define inicTela() inicializar()
+    #define rodaT() rodaTela()
+#else
+    #define inicTela()
+    #define rodaT()
+#endif
 
 using namespace std;
 
@@ -267,25 +273,39 @@ void comunica(int i){
                 int dist;
                 dist = atoi(buffer);
                 ply[i]->vira(dist);
+                roboX[robot][turno] = ply[i]->getX();
+                roboY[robot][turno] = ply[i]->getY();
+
+                if(sTurno == true){
+                    turno++;
+                    sTurno = false;
+                }
+                else{
+                    sTurno = true;
+                }
+
             }
             else if(strcmp(buffer,"anda") == 0){
                 anda(robot);
+                roboX[robot][turno] = ply[i]->getX();
+                roboY[robot][turno] = ply[i]->getY();
+
+                if(sTurno == true){
+                    turno++;
+                    sTurno = false;
+                }
+                else{
+                    sTurno = true;
+                }
+
+
             }
             else{
                 strcpy(resp,"noo");
             }
 
             send(client, resp, sizeof(resp), 0);
-            roboX[robot][turno] = ply[i]->getX();
-            roboY[robot][turno] = ply[i]->getY();
 
-            if(sTurno == true){
-                turno++;
-                sTurno = false;
-            }
-            else{
-                sTurno = true;
-            }
         }
 
         while(strcmp(buffer,"endGame") == 0){
@@ -336,9 +356,9 @@ void criaT2(){
 
 void iniciaUsers(){
 
-    system("MinGW64\bin\g++ user.cpp -o user1 -lws_32s");
+    system("MinGW64\\bin\\g++ user.cpp -o user1 -lws_32s");
     Sleep(1000);
-    system("g++ user.cpp -o user2 -lws_32s");
+    system("MinGW64\\bin\\g++ user.cpp -o user2 -lws_32s");
     Sleep(1000);
 
     system("start user");
@@ -349,10 +369,12 @@ void iniciaUsers(){
     }
 
 bool checkP1(int i){
-    if (ply[i]->getX() < (-15) || ply[i]->getX() > 15){
+    if (ply[i]->getX() < -15 || ply[i]->getX() > 15){
+        cout<< "robo "<< i << "está em "<< ply[i]->getX() << endl;
         return true;
     }
-    else if(ply[i]->getY() < (-15) || ply[i]->getY() > 15){
+    else if(ply[i]->getY() < -15 || ply[i]->getY() > 15){
+        cout<< "robo "<< i << "está em "<< ply[i]->getY() << endl;
         return true;
     }
     else{
@@ -368,7 +390,9 @@ cout<< "Player 1 x \t y \t dir" << " || Player 2 x \t y \t dir" << endl;
 
 }
 
+void a(char *text){
 
+}
 
 void error_msg(char *text){
     	al_show_native_message_box(NULL,"ERRO",
@@ -467,7 +491,7 @@ int inicializar(){
     return 1;
 }
 
-int rodaTela(void){
+int rodaTela(){
 
     int vez;
     vez = 0;
@@ -555,8 +579,8 @@ int main()
     system("cls");
     start = true;
     while(!gameover){
-
-        //printGame();
+        system("cls");
+        printGame();
 
         if(checkP1(0)){
             gameover = true;
@@ -564,7 +588,6 @@ int main()
         else if(checkP1(1)){
             gameover = true;
         }
-        cout<<"to no while gameover e " << gameover << endl;
     }
 
     cout<<"sai do while"<< endl;
@@ -576,14 +599,8 @@ int main()
         cout << "player 1 venceu" << endl;
     }
 
+    rodaTela();
 
-    int i;
-    for(i =0; i <= turno; i++){
-
-        cout<< "robo 1 X" << roboX[0][i] << "\t robo 1 Y" << roboY[0][i] << endl;
-        cout<< "robo 2 X" << roboX[1][i] << "\t robo 2 Y" << roboY[1][i] << "\t for nro:" << i << endl;
-    }
-    Sleep(1000);
 
 
     return 0;

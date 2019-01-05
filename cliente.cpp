@@ -5,9 +5,9 @@
 #include "user.cpp"
 
 #include <iostream>
+#include <winsock2.h>
 #include <Windows.h>
 #include <stdio.h>
-#include <winsock2.h>
 #include <cstdlib>
 
 
