@@ -4,8 +4,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <windows.h>
+#include <vector>
 
-#define ALLEGRO 1
+#define ALLEGRO 0
+
+
 
     #include <allegro5/allegro.h>
     #include <allegro5/allegro_native_dialog.h>
@@ -31,13 +34,15 @@
     #define rodaT()
 #endif
 
+
+
 using namespace std;
 
     bool gameover = false;
     bool start = false;
     char aux[1024];
-    float roboX[2][10000];
-    float roboY[2][10000];
+    vector<  vector<float>> roboX;
+    vector<  vector<float>> roboY;
     int turno = 0;
     bool sTurno = false;
 
@@ -70,6 +75,22 @@ Robo *ply[2];
     SOCKET server, client , client2;
 
     SOCKADDR_IN serverAddr,clientAddr, clientAddr2;
+
+
+    int attSimY (int i, float x){
+
+//    roboY.push_back(vector<float>());
+  //  roboY[i].push_back(x);
+
+
+  return 1;
+}
+void attSimX (int i, float x){
+
+    roboX.push_back(vector<float>());
+    roboX[i].push_back(x);
+
+}
 
 void criaServer(){
     WSAStartup(MAKEWORD(2,0), &WSAData);
@@ -256,6 +277,7 @@ void comunica(int i){
 
         while (!gameover){
             recv(client, buffer, sizeof(buffer), 0);
+            cout << "recebi " << buffer << endl;
             if(strcmp(buffer,"leituraFre") == 0){
                 leituraFre(robot);
                 strcpy(resp, aux);
@@ -287,8 +309,8 @@ void comunica(int i){
             }
             else if(strcmp(buffer,"anda") == 0){
                 anda(robot);
-                roboX[robot][turno] = ply[i]->getX();
-                roboY[robot][turno] = ply[i]->getY();
+                attSimX(robot,ply[i]->getX());
+                attSimY(robot, ply[i]->getY());
 
                 if(sTurno == true){
                     turno++;
@@ -297,7 +319,6 @@ void comunica(int i){
                 else{
                     sTurno = true;
                 }
-
 
             }
             else{
@@ -336,6 +357,7 @@ void criaT1(){
 	DWORD mythreadid;
 	myhandle = CreateThread(0, 0, mythread, 0, 0, &mythreadid);
 
+
 }
 
 DWORD WINAPI player2( LPVOID lpParameter)
@@ -356,19 +378,22 @@ void criaT2(){
 
 void iniciaUsers(){
 
+/*
     system("MinGW64\\bin\\g++ user.cpp -o user1 -lws_32s");
     Sleep(1000);
     system("MinGW64\\bin\\g++ user.cpp -o user2 -lws_32s");
     Sleep(1000);
-
+*/
     system("start user");
     cout<< "iniciando o segundo ! "<< endl;
-   // system("start user");
+    Sleep(100);
+    system("start user2");
     cout<< "terminei" << endl;
 
     }
 
 bool checkP1(int i){
+    cout << "checando p"<<i << endl;
     if (ply[i]->getX() < -15 || ply[i]->getX() > 15){
         cout<< "robo "<< i << "está em "<< ply[i]->getX() << endl;
         return true;
@@ -574,14 +599,14 @@ int main()
     Sleep(10);
     criaT1();
     criaT2();
-    Sleep(10);
     iniciaUsers();
     system("cls");
     start = true;
-    while(!gameover){
-        system("cls");
-        printGame();
 
+    while(!gameover){
+        //system("cls");
+        //printGame();
+        cout << "está checando "<< endl;
         if(checkP1(0)){
             gameover = true;
         }
@@ -599,7 +624,19 @@ int main()
         cout << "player 1 venceu" << endl;
     }
 
-    rodaTela();
+    // Displaying the 2D vector
+    for (int i = 0; i < roboX.size(); i++) {
+        for (int j = 0; j < roboX[i].size(); j++)
+            cout << roboX[i][j] << " ";
+            cout << endl;
+    }
+
+	cout<< "agora Y" << endl;
+	for (int i = 0; i < roboY.size(); i++) {
+        for (int j = 0; j < roboY[i].size(); j++)
+            cout << roboY[i][j] << " ";
+            cout << endl;
+    }
 
 
 

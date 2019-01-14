@@ -2,8 +2,9 @@
 #define CLIENT
 
 #include <iostream>
-#include <windows.h>
 #include "cliente.cpp"
+#include <windows.h>
+
 
 
 using namespace std;
