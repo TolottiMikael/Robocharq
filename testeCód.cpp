@@ -5,6 +5,11 @@
 #include <math.h>
 #include <windows.h>
 #include <vector>
+#include <time.h>
+#include <conio.h>
+
+#include "interface.cpp"
+
 
 
 using namespace std;
@@ -16,8 +21,11 @@ using namespace std;
     vector<float> rob1Y;
     vector<float> rob2X;
     vector<float> rob2Y;
-    int turno = 0;
-    bool sTurno = false;
+    vector<float> dir1;
+    vector<float> dir2;
+    int turno[2];
+
+    double timeout = 1/100;
 
     class Robo {
 
@@ -50,6 +58,9 @@ Robo *ply[2];
     SOCKADDR_IN serverAddr,clientAddr, clientAddr2;
 
 
+
+//Funções do programa
+
     int attSimY (int i, float x){
 
     if (i == 0){
@@ -72,6 +83,30 @@ void attSimX (int i, float x){
     }
 
 }
+
+void attDir(int i, float x){
+
+    if (i == 0){
+        dir1.push_back(x);
+    }
+    else if(i == 1){
+        dir2.push_back(x);
+    }
+}
+
+double timed_getch(double n_seconds)
+{
+   time_t start, now;
+
+   start = time(NULL);
+   now = start;
+
+   while(difftime(now, start) < n_seconds) {
+        now = time(NULL);
+   }
+    return EOF;
+}
+
 
 void criaServer(){
     WSAStartup(MAKEWORD(2,0), &WSAData);
@@ -236,8 +271,20 @@ void anda(int i){
 }
 }
 
+int checkP1(int i){
+    if (ply[i]->getX() < -15 || ply[i]->getX() > 15){
+        return 1;
+    }
+    if(ply[i]->getY() < -15 || ply[i]->getY() > 15){
+        return 1;
+    }
+    return 0;
+}
+
 void comunica(int i){
 
+    turno[0] = 0;
+    turno[1] = 0;
     int robot = i;
     char buffer[1024];
     char resp[1024];
@@ -253,8 +300,12 @@ void comunica(int i){
     int clientAddrSize = sizeof(clientAddr);
     if((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET)
     {
-
         while (!gameover){
+
+            time_t init;
+            time_t fim;
+
+            init = time(NULL);
             recv(client, buffer, sizeof(buffer), 0);
             if(strcmp(buffer,"leituraFre") == 0){
                 leituraFre(robot);
@@ -273,24 +324,6 @@ void comunica(int i){
                 int dist;
                 dist = atoi(buffer);
                 ply[i]->vira(dist);
-
-                if(robot == 0){
-                    rob1X.push_back(ply[i]->getX());
-                    rob1Y.push_back(ply[i]->getY());
-                }
-                else if(robot == 1){
-                    rob2X.push_back(ply[i]->getX());
-                    rob2Y.push_back(ply[i]->getY());
-                }
-
-                if(sTurno == true){
-                    turno++;
-                    sTurno = false;
-                }
-                else{
-                    sTurno = true;
-                }
-
             }
             else if(strcmp(buffer,"anda") == 0){
                 anda(robot);
@@ -300,16 +333,20 @@ void comunica(int i){
             }
 
             send(client, resp, sizeof(resp), 0);
-            if(sTurno == true){
-                    turno++;
-                    sTurno = false;
-                    attSimX(robot,ply[i]->getX());
-                    attSimY(robot, ply[i]->getY());
 
+            turno[robot]++;
+
+            if(!checkP1(robot)){
+                attSimX(robot,ply[i]->getX());
+                attSimY(robot, ply[i]->getY());
+                attDir(robot, ply[i]->getY());
             }
-            else{
-                    sTurno = true;
+            else {
+                gameover = true;
             }
+
+            fim = time(NULL);
+            timed_getch(timeout - (fim - init));
         }
 
         while(strcmp(buffer,"endGame") == 0){
@@ -360,47 +397,37 @@ void criaT2(){
 
 void iniciaUsers(){
 
-/*
-    system("MinGW64\\bin\\g++ user.cpp -o user1 -lws_32s");
-    Sleep(1000);
-    system("MinGW64\\bin\\g++ user.cpp -o user2 -lws_32s");
-    Sleep(1000);
-*/
+
+    system("mingw64\\bin\\g++ user.cpp -o user -lws2_32");
+    system("mingw64\\bin\\g++ user2.cpp -o user2 -lws2_32");
+
+
     system("start user");
     cout<< "iniciando o segundo ! "<< endl;
-    Sleep(100);
+    Sleep(1000);
     system("start user2");
     cout<< "terminei" << endl;
-
-    }
-
-bool checkP1(int i){
-    if (ply[i]->getX() < -15 || ply[i]->getX() > 15){
-        cout<< "robo "<< i << "está em "<< ply[i]->getX() << endl;
-        return true;
-    }
-    else if(ply[i]->getY() < -15 || ply[i]->getY() > 15){
-        cout<< "robo "<< i << "está em "<< ply[i]->getY() << endl;
-        return true;
-    }
-    else{
-        return false;
-    }
-}
-
-void printGame(){
-
-cout<< "Player 1 x \t y \t dir" << " || Player 2 x \t y \t dir" << endl;
-        cout<< " \t "<< ply[0]->getX() << " \t " << ply[0]->getY() << " \t " << ply[0]->getDir()
-        << " ||\t " << ply[1]->getX() << " \t " << ply[1]->getY() << " \t " << ply[1]->getDir() << endl;
 
 }
 
 int main()
 {
+    inicializar();
+    int menu;
+    menu = telaInicial();
+
+    cout << "clicou no botao " << menu << endl;
+
 
     ply[0] = new Robo(5 , 10);
     ply[1] = new Robo(10, 10);
+    attSimX(0, ply[0]->getX());
+    attSimY(0, ply[0]->getY());
+    attDir(0, ply[0]->getDir());
+
+    attSimX(1, ply[1]->getX());
+    attSimY(1, ply[1]->getY());
+    attDir(1, ply[1]->getDir());
 
     criaServer();
     Sleep(10);
@@ -409,37 +436,39 @@ int main()
     iniciaUsers();
     system("cls");
     start = true;
-    Sleep(100);
     while(!gameover){
-        system("cls");
-        printGame();
-
-        if(checkP1(0)){
-            gameover = true;
-        }
-        else if(checkP1(1)){
-            gameover = true;
-        }
-        Sleep(1);
+        Sleep(10);
     }
-
-    cout<<"sai do while"<< endl;
-
-    if(checkP1(0)){
-        cout << "player 2 venceu" << endl;
+    int menor;
+    if (turno[1] >= turno[0]){
+        menor = turno[0];
     }
     else {
-        cout << "player 1 venceu" << endl;
+        menor = turno[1];
+    }
+    int i = menor;
+    system("cls");
+    cout << "total de " << menor << " turnos !" << endl;
+    system("pause");
+
+    if(i > 0){
+        int j;
+        for(j = 0; j <= i; j++){
+            //mostrando na tela
+            time_t init;
+            time_t fim;
+            init = time(NULL);
+            cout << "Robo 1 "<< rob1X[j]<< " " << rob1Y[j]<< " " << dir1[j] << endl;
+            cout << "Robo 2 "<< rob2X[j]<< " " << rob2Y[j]<< " " << dir2[j] << endl;
+            if (rodaTela( rob1X[j] , rob1Y[j] , dir1[j] , rob2X[j] , rob2Y[j] , dir2[j] ) == 1) destroyJanela();
+
+            fim = time(NULL);
+            timed_getch((1 /60 ) - (fim - init));
+        }
+
     }
 
-    int i = 0;
-    cout << "total de " << turno << " turnos !" << endl;
-    system("pause");
-    system("cls");
-    cout << "Robo 1 : X "<< "\t Robo 1 : Y" << "||" << "Robo 2 : X "<< "\t Robo 2 : Y" <<endl;
-    for(i =0; i <= turno; i++){
-        cout<< rob1X[i] << "\t "<< rob1Y[i] << "||" << rob2X[i] << "\t "<< rob2Y[i] << endl;
-    }
+
 
     return 0;
 }
@@ -477,6 +506,7 @@ float Robo::getY(){
 Robo::Robo(float a, float b){
     this->x = a;
     this->y = b;
+
 }
 
 void Robo::andaX(float X){

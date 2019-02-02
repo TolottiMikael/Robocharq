@@ -15,12 +15,15 @@ void setup(){
 }
 
 void loop(){
-    while(leituraFre() == 0){
+   if(leituraFre() == 0){
         vira(1);
         cout << "viraaa" << endl;
     }
-    cout << " anda !!!" << endl;
-    anda();
+    else{
+        cout << " anda !!!" << endl;
+        anda();
+    }
+
 
 }
 

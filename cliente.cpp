@@ -9,6 +9,8 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <time.h>
+#include <conio.h>
 
 
 
@@ -19,6 +21,7 @@ char env[1024];
 char response[1024];
 void setup();
 void loop();
+double timeout = 1/100;
 
 
     WSADATA WSAData;
@@ -105,6 +108,20 @@ bool checkGame(){
     }
 }
 
+double timed_getch(double n_seconds)
+{
+   time_t start, now;
+
+   start = time(NULL);
+   now = start;
+
+   while(difftime(now, start) < n_seconds) {
+        now = time(NULL);
+   }
+    return EOF;
+}
+
+
 int main(){
 
 
@@ -114,11 +131,14 @@ int main(){
 
     strcpy(env, "llobby");
     while(!gameover){
+        time_t init;
+        time_t fim;
         loop();
         if(checkGame){
             gameover = true;
         }
-
+        fim = time(NULL);
+        timed_getch(timeout - (fim - init));
         system("cls");
     }
 
