@@ -5,8 +5,6 @@
 #include "cliente.cpp"
 #include <windows.h>
 
-
-
 using namespace std;
 
 

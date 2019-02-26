@@ -15,6 +15,8 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
 
 #define LARGURA_TELA 640
@@ -55,6 +57,12 @@ int inicializar(){
         al_destroy_timer(timer);
         return 0;
     }
+
+	//inicializa addon do teclado
+        if (!al_install_keyboard()){
+            error_msg("Falha ao inicializar o teclado");
+            return 0;
+        }
 
     al_set_window_title(janela, "Mikael Simulations");
 
@@ -137,6 +145,211 @@ int destroyJanela(){
     return 0;
 }
 
+int getchAllegro(){
+       int sair = 0;
+        int tecla = 0;
+
+        int nFPS = 0;
+
+
+        //registra duas fontes de eventos na fila. o da janela, e do teclado
+        al_register_event_source(fila_eventos, al_get_keyboard_event_source());
+        al_register_event_source(fila_eventos, al_get_display_event_source(janela));
+
+        al_clear_to_color(al_map_rgb(255, 255, 255));
+        while (!sair){
+            while(!al_is_event_queue_empty(fila_eventos)){
+                ALLEGRO_EVENT evento;
+                //espera ate que algum evento esteja na fila
+                al_wait_for_event(fila_eventos, &evento);
+
+                //se o evento for pressionar uma tecla
+                if (evento.type == ALLEGRO_EVENT_KEY_DOWN){
+                    //verifica qual tecla foi pressionada
+                    tecla = evento.keyboard.keycode;
+
+                    //enter
+                    if(tecla == 67 || tecla == 91){
+                        sair = 1;
+                    }
+                    //apertou 1
+                    else if(tecla == 38 || tecla == 28){
+                        nFPS = nFPS * 10;
+                        nFPS += 1;
+                    }
+
+                    //apertou 2
+                    else if(tecla == 39 || tecla == 29){
+                        nFPS = nFPS * 10;
+                        nFPS += 2;
+                    }
+                    //apertou 3
+                    else if(tecla == 40 || tecla == 30){
+                        nFPS = nFPS * 10;
+                        nFPS += 3;
+                    }
+                    //apertou 4
+                    else if(tecla == 41 || tecla == 31){
+                        nFPS = nFPS * 10;
+                        nFPS += 4;
+                    }
+                    //apertou 5
+                    else if(tecla == 42 || tecla == 32){
+                        nFPS = nFPS * 10;
+                        nFPS += 5;
+                    }
+                    //apertou 6
+                    else if(tecla == 43 || tecla == 33){
+                        nFPS = nFPS * 10;
+                        nFPS += 6;
+                    }
+                    //apertou 7
+                    else if(tecla == 44 || tecla == 34){
+                        nFPS = nFPS * 10;
+                        nFPS += 7;
+                    }
+                    //apertou 8
+                    else if(tecla == 45 || tecla == 35){
+                        nFPS = nFPS * 10;
+                        nFPS += 8;
+                    }
+                    //apertou 9
+                    else if(tecla == 46 || tecla == 36){
+                        nFPS = nFPS * 10;
+                        nFPS += 9;
+                    }
+                    //apertou 0
+                    else if(tecla == 37 || tecla == 27){
+                        nFPS = nFPS * 10;
+                        nFPS += 0;
+                    }
+
+                }
+
+                //se clicou para fechar a janela
+                else if (evento.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+                    sair = 1;
+                }
+                std::cout<<"Fps atual: " << nFPS<< std::endl;
+            }
+
+                //zera a tecla para a proxima vez nao entrar aqui de novo
+                tecla = 0;
+
+
+            al_flip_display();
+        }
+        if (nFPS <= 0){
+            nFPS = 60;
+        }
+
+
+        al_destroy_display(janela);
+        al_destroy_event_queue(fila_eventos);
+        return nFPS;
+    }
+
+
+
+int rodaConfig(){
+
+    ALLEGRO_BITMAP *botao1 = NULL;
+    botao1 = al_create_bitmap(100, 100);
+
+    ALLEGRO_BITMAP *botao2 = NULL;
+    botao2 = al_create_bitmap(100, 100);
+
+    if(!botao1) {
+        al_destroy_bitmap(botao1);
+        destroyJanela();
+    }
+    if(!botao2) {
+        al_destroy_bitmap(botao1);
+        al_destroy_bitmap(botao2);
+        destroyJanela();
+    }
+
+    if (!al_install_mouse()){
+        error_msg("Falha ao inicializar o mouse");
+        al_destroy_display(janela);
+        return -1;
+    }
+
+    // Atribui o cursor padrão do sistema para ser usado
+    if (!al_set_system_mouse_cursor(janela, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT)){
+        error_msg("Falha ao atribuir ponteiro do mouse");
+        al_destroy_display(janela);
+        return -1;
+    }
+
+    ALLEGRO_EVENT_QUEUE *nEventos = NULL;
+
+    nEventos = al_create_event_queue();
+
+    al_register_event_source(nEventos, al_get_mouse_event_source());
+
+    int sair = 0;
+    int botaoClicado;
+    while (sair == 0){
+        // Verificamos se há eventos na fila
+        while (!al_is_event_queue_empty(nEventos)){
+
+            ALLEGRO_EVENT evento;
+            al_wait_for_event(nEventos, &evento);
+
+            // Se o evento foi de click do mouse
+
+            if (evento.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
+                // Verificamos se ele está sobre a região do rbotão 1
+                // aqui Seta o FPS:
+                if (evento.mouse.x >= 40 &&
+                    evento.mouse.x <= 40 + ( al_get_bitmap_width(botao1)) &&
+                    evento.mouse.y >= 40 &&
+                    evento.mouse.y <= 40 - ( al_get_bitmap_height(botao1) ) ) {
+                    botaoClicado = 1;
+                    sair = 1;
+                    std::cout<<"apertou o botao1" << std::endl;
+                }
+                // aqui ele quer voltar
+                else if (evento.mouse.x >= 150 &&
+                    evento.mouse.x <= 150 + ( al_get_bitmap_width(botao2)  ) &&
+                    evento.mouse.y >= 40 &&
+                    evento.mouse.y <= 40 + ( al_get_bitmap_height(botao2) ) ){
+                    botaoClicado = 2;
+                    sair = 1;
+                    std::cout<<"apertou o botao2" << std::endl;
+                }
+
+
+            }
+
+
+        }
+
+                // Limpamos a tela
+        al_clear_to_color(al_map_rgb(0, 0, 0));
+
+         //pintando botao1
+        al_set_target_bitmap(botao1);
+         al_clear_to_color(al_map_rgb(255, 255, 255));
+
+        //pintando botao2
+        al_set_target_bitmap(botao2);
+         al_clear_to_color(al_map_rgb(0, 255, 255));
+
+        al_set_target_bitmap(al_get_backbuffer(janela));
+        al_clear_to_color(al_map_rgb(0,0,0));
+
+
+        al_draw_bitmap(botao1, 40, 40, 0);
+        al_draw_bitmap(botao2, 150, 40, 0);
+
+        // Atualiza a tela
+        al_flip_display();
+    }
+    std::cout<< "ele apertou o botao (config) "<< botaoClicado << std::endl;
+    return botaoClicado;
+}
 
 
 
@@ -189,21 +402,25 @@ int telaInicial(){
 
     int sair = 0;
     int botaoClicado;
-    while (!sair){
+    while (sair == 0){
         // Verificamos se há eventos na fila
-        while (!al_is_event_queue_empty(fila_eventos)){
+        while (!al_is_event_queue_empty(nEventos)){
+
             ALLEGRO_EVENT evento;
             al_wait_for_event(nEventos, &evento);
 
             // Se o evento foi de click do mouse
+
             if (evento.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP){
                 // Verificamos se ele está sobre a região do rbotão 1
+
                 if (evento.mouse.x >= 40 &&
                     evento.mouse.x <= 40 + ( al_get_bitmap_width(botao1)) &&
                     evento.mouse.y >= 40 &&
-                    evento.mouse.y <= 40 + ( al_get_bitmap_height(botao1) ) ) {
+                    evento.mouse.y <= 40 - ( al_get_bitmap_height(botao1) ) ) {
                     botaoClicado = 1;
                     sair = 1;
+
                 }
                 else if (evento.mouse.x >= 150 &&
                     evento.mouse.x <= 150 + ( al_get_bitmap_width(botao2)  ) &&
@@ -216,14 +433,14 @@ int telaInicial(){
                     evento.mouse.x <= 260 + ( al_get_bitmap_width(botao3) ) &&
                     evento.mouse.y >= 40 &&
                     evento.mouse.y <= 40 + ( al_get_bitmap_height(botao3) ) ){
-                    botaoClicado = 3;
-                    sair = 1;
-                }
-                else {
                     botaoClicado = 0;
-                    sair = 0;
-                }
+                    sair = 1;
+                    }
+
+
             }
+
+
         }
 
                 // Limpamos a tela
@@ -253,7 +470,6 @@ int telaInicial(){
         al_flip_display();
 
     }
-    destroyJanela();
     return botaoClicado;
 }
 
@@ -301,8 +517,10 @@ int rodaTela(float X1,float Y1, float dir1, float X2,float Y2, float dir2){
                         return 1;
             }
 
+    return 0;
+}
 
-
+int rodaCred(){
     return 0;
 }
 

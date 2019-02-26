@@ -3,6 +3,7 @@
 
 
 #include "user.cpp"
+#include "arduino.cpp"
 
 #include <iostream>
 #include <winsock2.h>
@@ -22,7 +23,7 @@ char response[1024];
 void setup();
 void loop();
 double timeout = 1/100;
-
+time_t inicioCod, millis;
 
     WSADATA WSAData;
     SOCKET server;
@@ -121,6 +122,25 @@ double timed_getch(double n_seconds)
     return EOF;
 }
 
+void delay(double nSeconds){
+    Sleep(nSeconds);
+}
+
+void delay(double nSeconds){
+    nSeconds = nSeconds / 1000;
+    Sleep(nSeconds);
+}
+
+double millis(){
+    millis = time(NULL);
+    return millis - inicioCod;
+}
+
+double micros(){
+    millis = time(NULL);
+    millis = millis/1000;
+    return millis - inicioCod;
+}
 
 int main(){
 
@@ -128,6 +148,7 @@ int main(){
     conecta();
     char resp[1024];
     char buffer[1024];
+    inicioCod = time(NULL);
 
     strcpy(env, "llobby");
     while(!gameover){
